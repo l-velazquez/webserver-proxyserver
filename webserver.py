@@ -22,7 +22,7 @@ while True:
           #Need to send the index.html file in different parts
           #filename is an array that will have all the elements
           #of the html file that will be sent to the sockets 
-          filename = "indexs.html"
+          filename = "index.html"
           f = open(filename)
           output = f.read()
           client.send(('HTTP/1.0 200 OK\n\n' + output).encode())
