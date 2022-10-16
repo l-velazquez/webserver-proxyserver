@@ -18,12 +18,14 @@ while 1:
     print('Ready to serve...')
     tcpCliSock, addr = tcpSerSock.accept()
     print('Received a connection from:', addr)
+
     message = 'hello'# Fill in start.
     # Fill in end.
     print(message)
     # Extract the filename from the given message
     print(message.split()[1])
     filename = message.split()[1].partition("/")[2]
+    
     print(filename)
     fileExist = "false"
     filetouse = "/" + filename
@@ -48,7 +50,6 @@ while 1:
             hostn = filename.replace("www.","",1)
             print(hostn)
             try:
-                print("hi")
                 # Connect to the socket to port 80
                 # Fill in start.
                 # Fill in end.
