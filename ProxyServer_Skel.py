@@ -1,3 +1,11 @@
+#-------------------------------------------------------------------------
+#    Program: webserver.py
+#    Programmer: Luis F. Velázquez Sosa
+#    Discription:
+#         This program is meant to cache the web pages that the client 
+#         request to send. I uses the localhost ip and the port given 
+#         in the command line. 
+#-------------------------------------------------------------------------
 from socket import *
 import os
 import sys
@@ -21,14 +29,24 @@ while 1:
 	print ('Ready to serve...')
 	tcpCliSock, addr = tcpSerSock.accept()
 	print ('Received a connection from:', addr)
-	message = # Fill in start. 			# Fill in end.
+	#---------------------------------------------------------------------
+#Recieving the message
+
+	message = tcpCliSock.recv(2048)
 	print(message)
 	# Extract the filename and hostname from the given message
 	print (message.split()[1])
-	filename = message.split()[1].partition("/")[2]
-	filename = filename.split("/")
+	filename = str(message.split()[1]).partition("/")[2]
+	filename = str(filename.split("/")).split("'")[0]
+	print(filename)
 	hostname = filename[1]
-	filename = "/".join(filename[1:])
+	#---------------------------------------------------------------------
+	if len(filename) > len(hostname):
+		hostname = filename
+	
+	#no entiendo porque hace esto?
+	#filename = "/".join(filename[1:])
+	#--------------------------------------------------------------------
 	print ("Filename", filename)
 	print ("Hostname", hostname)
 	fileExist = "false"
@@ -48,7 +66,8 @@ while 1:
 		# ProxyServer finds a cache hit and generates a response message
 		tcpCliSock.send("HTTP/1.0 200 OK\r\n")
 
-		# You might want to play with this part.  It is not always html in the cache
+		# You might want to play with this part.  
+		# It is not always html in the cache
 		tcpCliSock.send("Content-Type:text/html\r\n")
 
 		# Fill in start.
@@ -56,24 +75,29 @@ while 1:
 		# Fill in end.
 
 		print('Read from cache')
+	#---------------------------------------------------------------------
 	# Error handling for file not found in cache
 	except IOError:
 		if fileExist == "false":
 			# Create a socket on the proxyserver
-			c =  socket(AF_INET, SOCK_STREAM) # Fill in start. 			# Fill in end.
-
+			c =  socket(AF_INET, SOCK_STREAM) 
+			
 			try:
 				# Connect to the socket to port 80
-
+				port = 80
 				# Fill in start.
-
+				host  = c.gethostbyname(hostname)
+				c.connect((host,port))
 				# Fill in end.
 
 				# Create a temporary file on this socket and ask port 80 for the file requested by the client
 				fileobj = c.makefile('r', 0)
+				#write send to the server
 				fileobj.write("GET "+"http://" + filename + " HTTP/1.0\nHost: "+hostname+ "\n\n")
 				# Read the response into buffer
-
+				msg = c.recv(10000)
+				fread = fileobj.readlines()
+				buffer = 
 				# Fill in start.
 
 				# Fill in end.
@@ -94,6 +118,7 @@ while 1:
 		else:
 			# HTTP response message for file not found
 			tcpCliSock.send("HTTP/1.0 404 sendErrorErrorError\r\n")
+			tcpCliSock.close()
 			# Fill in start.
 
 			# Fill in end.

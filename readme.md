@@ -13,8 +13,8 @@ Run the file webserver.py in the termainal
 
     python3 webserver.py
 
-You can access the webserver by using the broweser client by writing in the web browser
+You can access the webserver by using the broweser client by writing in the web browser 
 
-    localhost:12000
+    localhost:12000 or ip-address-of-server:12000
 
-
+To connect to the server just put the ip address of the server into the  browser or if running in the same machine you are runnging the server just put localhost as the ip.
