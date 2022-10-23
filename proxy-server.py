@@ -1,13 +1,22 @@
+#-------------------------------------------------------------------------
+#   Course: CCOM 4105
+#   Profesor: Jose Ortiz
+#   Programmer: Luis F. Velazquez Sosa
+#   Student Number: 801-18-8580
+#   Discription:
+#         
+#          
+#-------------------------------------------------------------------------
 from socket import *
-import sys
+#import sys
 
 
-if len(sys.argv) <= 1:
+'''if len(sys.argv) <= 1:
     print('Usage : "python ProxyServer.py server_ip"\n[server_ip : It is the IP Address Of Proxy Server')
-    sys.exit(2)
+    sys.exit(2)'''
 
 ADDRESS = "localhost"
-PORT = 12000
+PORT = 12001
 # Create a server socket, bind it to a port and start listening
 tcpSerSock = socket(AF_INET, SOCK_STREAM)
 tcpSerSock.bind((ADDRESS,PORT))
@@ -19,12 +28,12 @@ while 1:
     tcpCliSock, addr = tcpSerSock.accept()
     print('Received a connection from:', addr)
 
-    message = 'hello'# Fill in start.
+    message = tcpCliSock.recv(2048)
     # Fill in end.
     print(message)
     # Extract the filename from the given message
     print(message.split()[1])
-    filename = message.split()[1].partition("/")[2]
+    filename = (str(message.split()[1]).partition("/")[2]).split("'")[0]
     
     print(filename)
     fileExist = "false"
@@ -45,7 +54,10 @@ while 1:
     except IOError:
         if fileExist == "false":
             # Create a socket on the proxyserver
-            c = "hi"# Fill in start.
+            port = 80
+            c = socket()
+            host = gethostbyname(filename)
+            c.connect((host,port))
             # Fill in end.
             hostn = filename.replace("www.","",1)
             print(hostn)
@@ -57,8 +69,9 @@ while 1:
                 fileobj = c.makefile('r', 0)
                 fileobj.write("GET"+"http://"+filename+"HTTP/1.0\n\n")
                 # Read the response into buffer
-                # Fill in start.
-                # Fill in end.
+                msg = c.recv(10000)
+                fread = fileobj.read()
+                buffer = []  
                 # Create a new file in the cache for the requested file.
                 # Also send the response in the buffer to client socket and the corresponding file in the cache
                 tmpFile = open("./" + filename,"wb")
@@ -67,7 +80,9 @@ while 1:
             except:
                 print("Illegal request")
         else:
-            print('hi')
+            c.send('HTTP/1.0 404 Not Found\r\n'.encode())
+            c.close()
+
             # HTTP response message for file not found
             # Fill in start.
             # Fill in end.
