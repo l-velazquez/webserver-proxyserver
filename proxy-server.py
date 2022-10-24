@@ -17,6 +17,7 @@ from socket import *
 
 ADDRESS = "localhost"
 PORT = 12001
+lenx = 70
 # Create a server socket, bind it to a port and start listening
 tcpSerSock = socket(AF_INET, SOCK_STREAM)
 tcpSerSock.bind((ADDRESS,PORT))
@@ -31,10 +32,12 @@ while 1:
     message = tcpCliSock.recv(2048)
     # Fill in end.
     print(message)
+    print("-" * lenx)
+    print("\n")
     # Extract the filename from the given message
+
     print(message.split()[1])
     filename = (str(message.split()[1]).partition("/")[2]).split("'")[0]
-    
     print(filename)
     fileExist = "false"
     filetouse = "/" + filename
@@ -65,11 +68,20 @@ while 1:
                 # Connect to the socket to port 80
                 # Fill in start.
                 # Fill in end.
+                print("Searching for host:",host)
+                print("The host name is:",hostn)
                 # Create a temporary file on this socket and ask port 80 for the file requested by the client
-                fileobj = c.makefile('r', 0)
+                fileobj = open(hostn,"w")
                 fileobj.write("GET"+"http://"+filename+"HTTP/1.0\n\n")
+                outdata = fileobj.read()
+
+                print("File object", fileobj)
+                print("Sending output:", outdata)
+
+                c.send(outdata)
                 # Read the response into buffer
                 msg = c.recv(10000)
+                print("The message of the website is", msg)
                 fread = fileobj.read()
                 buffer = []  
                 # Create a new file in the cache for the requested file.
@@ -78,7 +90,8 @@ while 1:
                 # Fill in start.
                 # Fill in end.
             except:
-                print("Illegal request")
+                print("Illegal request\n\n")
+                print("-"*lenx)
         else:
             c.send('HTTP/1.0 404 Not Found\r\n'.encode())
             c.close()

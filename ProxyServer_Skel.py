@@ -12,11 +12,13 @@ import sys
 
 #from proxy-server import ADDRESS
 
-if len(sys.argv) <= 1:
+'''if len(sys.argv) <= 1:
 	print ('Usage : "python ProxyServer.py server_ip"\n[server_ip : It is the IP Address Of Proxy Server')
-	sys.exit(2)
+	sys.exit(2)'''
+
 ADDRESS = "localhost"
-PORT = 12000
+PORT = 12001
+lenx = 70
 
 # Create a server socket, bind it to a port and start listening
 tcpSerSock = socket(AF_INET, SOCK_STREAM)
@@ -33,20 +35,24 @@ while 1:
 #Recieving the message
 
 	message = tcpCliSock.recv(2048)
+	print("-"*lenx)
 	print(message)
 	# Extract the filename and hostname from the given message
 	print (message.split()[1])
-	filename = str(message.split()[1]).partition("/")[2]
-	filename = str(filename.split("/")).split("'")[0]
-	print(filename)
-	hostname = filename[1]
+	filename = str(str(message.split()[1]).partition("/")[2]).split("'")[0]
+	print("-"*lenx)
+	print("filename 1",filename)
+	print("filename.split('/')",filename.split("/"))
+	filename = filename.split("/")[0]
+	print("filename 2",filename)
+	hostname = filename[0]
 	#---------------------------------------------------------------------
 	if len(filename) > len(hostname):
-		hostname = filename
-	
+		hostname = filename		
 	#no entiendo porque hace esto?
 	#filename = "/".join(filename[1:])
 	#--------------------------------------------------------------------
+	print("-"*lenx)
 	print ("Filename", filename)
 	print ("Hostname", hostname)
 	fileExist = "false"
@@ -80,24 +86,27 @@ while 1:
 	except IOError:
 		if fileExist == "false":
 			# Create a socket on the proxyserver
-			c =  socket(AF_INET, SOCK_STREAM) 
+			port = 80
+			c = socket()
+			host = gethostbyname(filename)
+			c.connect((host,port)) 
 			
 			try:
 				# Connect to the socket to port 80
-				port = 80
 				# Fill in start.
-				host  = c.gethostbyname(hostname)
+				print("Searching for host:",host)
 				c.connect((host,port))
 				# Fill in end.
 
 				# Create a temporary file on this socket and ask port 80 for the file requested by the client
 				fileobj = c.makefile('r', 0)
+				print("File obj", fileobj)
 				#write send to the server
 				fileobj.write("GET "+"http://" + filename + " HTTP/1.0\nHost: "+hostname+ "\n\n")
 				# Read the response into buffer
 				msg = c.recv(10000)
 				fread = fileobj.readlines()
-				buffer = 
+				print(fread)
 				# Fill in start.
 
 				# Fill in end.
@@ -106,15 +115,13 @@ while 1:
 				# Create the directory structure if necessary.
 				# Also send the response in the buffer to client socket and the corresponding file in the cache
 				if not os.path.exists(filename):
-   					os.makedirs(os.path.dirname(filename))
-
-				tmpFile = open("./" + filetouse,"wb")
+					tmpFile = open("./" + filetouse,"wb")
 				# Fill in start.
 
 				# Fill in end.
 
 			except:
-				print ("Illegal request")
+				print ("Illegal request\n\n")
 		else:
 			# HTTP response message for file not found
 			tcpCliSock.send("HTTP/1.0 404 sendErrorErrorError\r\n")
