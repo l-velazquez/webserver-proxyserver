@@ -1,60 +1,53 @@
-#-------------------------------------------------------------------------
-#    Program: webserver.py
-#    Programmer: Luis F. Velázquez Sosa
-#    Discription:
-#         This program is meant to cache the web pages that the client 
-#         request to send. I uses the localhost ip and the port given 
-#         in the command line. 
-#-------------------------------------------------------------------------
+#Run code using Python 2.7.18
+
+
+
 from socket import *
 import os
 import sys
 
-#from proxy-server import ADDRESS
+if len(sys.argv) <= 1:
+	print 'Usage : "python ProxyServer.py server_ip"\n[server_ip : It is the IP Address Of Proxy Server'
+	sys.exit(2)
 
-'''if len(sys.argv) <= 1:
-	print ('Usage : "python ProxyServer.py server_ip"\n[server_ip : It is the IP Address Of Proxy Server')
-	sys.exit(2)'''
-
-ADDRESS = "localhost"
-PORT = 12001
+ADDRESS = sys.argv[1]
+PORT = int(sys.argv[2])
 lenx = 70
 
+
+print "-"*lenx
+print "Server address at",ADDRESS
+print "Port:", PORT
+print "-"*lenx
+print "*"*lenx
 # Create a server socket, bind it to a port and start listening
 tcpSerSock = socket(AF_INET, SOCK_STREAM)
 tcpSerSock.bind((ADDRESS,PORT))
 tcpSerSock.listen(5)
-#
+
 while 1:
 
 	# Start receiving data from the client
-	print ('Ready to serve...')
+	print "-"*lenx
+	print '\nReady to serve...'
 	tcpCliSock, addr = tcpSerSock.accept()
-	print ('Received a connection from:', addr)
-	#---------------------------------------------------------------------
-#Recieving the message
+	print 'Received a connection from:', addr
+	message = tcpCliSock.recv(4096) 			# Fill in end.
+	print message
 
-	message = tcpCliSock.recv(2048)
-	print("-"*lenx)
-	print(message)
 	# Extract the filename and hostname from the given message
-	print (message.split()[1])
-	filename = str(str(message.split()[1]).partition("/")[2]).split("'")[0]
-	print("-"*lenx)
-	print("filename 1",filename)
-	print("filename.split('/')",filename.split("/"))
+	print message.split()[1]
+	filename = message.split()[1].partition("/")[2]
+	print "filename1", filename
 	filename = filename.split("/")[0]
-	print("filename 2",filename)
+	print "filename2", filename
 	hostname = filename[0]
-	#---------------------------------------------------------------------
 	if len(filename) > len(hostname):
-		hostname = filename		
-	#no entiendo porque hace esto?
+		hostname = filename	
+	print "Hostname", hostname
 	#filename = "/".join(filename[1:])
-	#--------------------------------------------------------------------
-	print("-"*lenx)
-	print ("Filename", filename)
-	print ("Hostname", hostname)
+	print "Filename", filename
+	print "Hostname", hostname
 	fileExist = "false"
 
 	# File to use in cache
@@ -72,41 +65,37 @@ while 1:
 		# ProxyServer finds a cache hit and generates a response message
 		tcpCliSock.send("HTTP/1.0 200 OK\r\n")
 
-		# You might want to play with this part.  
-		# It is not always html in the cache
+		# You might want to play with this part.  It is not always html in the cache
 		tcpCliSock.send("Content-Type:text/html\r\n")
 
 		# Fill in start.
 
 		# Fill in end.
 
-		print('Read from cache')
-	#---------------------------------------------------------------------
+		print 'Read from cache'
 	# Error handling for file not found in cache
 	except IOError:
 		if fileExist == "false":
 			# Create a socket on the proxyserver
+			c = socket()# Fill in start. 			# Fill in end.
 			port = 80
-			c = socket()
-			host = gethostbyname(filename)
-			c.connect((host,port)) 
-			
+			host = gethostbyname(hostname)
+			c.connect((host,port))
 			try:
 				# Connect to the socket to port 80
+
 				# Fill in start.
-				print("Searching for host:",host)
-				c.connect((host,port))
+
 				# Fill in end.
 
 				# Create a temporary file on this socket and ask port 80 for the file requested by the client
 				fileobj = c.makefile('r', 0)
-				print("File obj", fileobj)
-				#write send to the server
 				fileobj.write("GET "+"http://" + filename + " HTTP/1.0\nHost: "+hostname+ "\n\n")
+				print"File object",fileobj
+				outfile = fileobj.read()
+				print "Output data is\n","-"*lenx,"\n",outfile
 				# Read the response into buffer
-				msg = c.recv(10000)
-				fread = fileobj.readlines()
-				print(fread)
+				c.send(outfile.encode())
 				# Fill in start.
 
 				# Fill in end.
@@ -115,17 +104,18 @@ while 1:
 				# Create the directory structure if necessary.
 				# Also send the response in the buffer to client socket and the corresponding file in the cache
 				if not os.path.exists(filename):
-					tmpFile = open("./" + filetouse,"wb")
+   					os.makedirs(os.path.dirname(filename))
+
+				tmpFile = open("./" + filetouse,"wb")
 				# Fill in start.
 
 				# Fill in end.
 
 			except:
-				print ("Illegal request\n\n")
+				print "Illegal request"
 		else:
 			# HTTP response message for file not found
 			tcpCliSock.send("HTTP/1.0 404 sendErrorErrorError\r\n")
-			tcpCliSock.close()
 			# Fill in start.
 
 			# Fill in end.

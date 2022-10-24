@@ -11,7 +11,7 @@ from socket import *
 import sys # In order to terminate the program
 
 debug = 0
-PORT = 12001
+PORT = 12000
 
 serverSocket = socket(AF_INET, SOCK_STREAM)
 #Prepare a sever socket
@@ -38,7 +38,7 @@ while True:
           #of the html file that will be sent to the sockets 
           if not debug:
                #test code to observe what the client sends (helped to make the proxy)
-               message = client.recv(2048)
+               '''message = client.recv(2048)
                print("message:",message)
                print (str(message.split()[1]).partition("/")[2])
                msg2 = message.split()[1]
@@ -48,11 +48,11 @@ while True:
                print(msg3)
                print(len(msg3))
                #-----------------------------------
-               '''if len(msg3) > 1:
+               if len(msg3) > 1:
                     hostname = msg3[1]
                else:
                     hostname = msg3
-               msg3 = "/".join(msg3[1:])'''
+               msg3 = "/".join(msg3[1:])
                #-----------------------------------
                hostname = msg3[1]
                #filename = "/".join(msg3[1:])
@@ -67,8 +67,8 @@ while True:
                print(msg3[-1])
                if msg3[-1] == "/":
                     filetouse += "index.html"
-               print(filetouse)
-
+               print(filetouse)'''
+               print("-"*70)
                filename = "index.html"
                print("Opening ",filename,"...")
                f = open(filename)

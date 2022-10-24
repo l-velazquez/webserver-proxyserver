@@ -48,8 +48,8 @@ while 1:
         outputdata = f.readlines()
         fileExist = "true"
         # ProxyServer finds a cache hit and generates a response message
-        tcpCliSock.send("HTTP/1.0 200 OK\r\n")
-        tcpCliSock.send("Content-Type:text/html\r\n")
+        tcpCliSock.send("HTTP/1.0 200 OK\r\n".encode())
+        tcpCliSock.send("Content-Type:text/html\r\n".encode())
         # Fill in start.
         # Fill in end.
         print('Read from cache')
