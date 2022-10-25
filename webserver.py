@@ -6,6 +6,8 @@
 #         using sockets. It a simple web server that uses HTTP 1.0
 #         to send to the browser client of your choice. Tested to
 #         function with Chrome, Edge and Firefox. 
+#
+#    
 #-------------------------------------------------------------------------
 from socket import *
 import sys # In order to terminate the program
