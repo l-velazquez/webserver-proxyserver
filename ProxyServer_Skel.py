@@ -4,6 +4,7 @@
 from socket import *
 import os
 import sys
+import tempfile
 
 if len(sys.argv) <= 1:
 	print 'Usage : "python ProxyServer.py server_ip"\n[server_ip : It is the IP Address Of Proxy Server'
@@ -12,7 +13,7 @@ if len(sys.argv) <= 1:
 ADDRESS = sys.argv[1]
 PORT = int(sys.argv[2])
 lenx = 75
-debug = 1 #meant to debug the code
+debug = 0 #meant to debug the code
 
 #formating for the terminal
 
@@ -72,11 +73,14 @@ while 1:
 		# Check wether the file exist in the cache
 		f = open(filetouse, "r")
 		outputdata = f.readlines()
+		print"Reading the file",filetouse 
 		fileExist = "true"
 		# ProxyServer finds a cache hit and generates a response message
 		tcpCliSock.send("HTTP/1.0 200 OK\r\n")
 		# You might want to play with this part.  It is not always html in the cache
 		tcpCliSock.send("Content-Type:text/html\r\n")
+		for line in f:
+			tcpCliSock.send(line)
 
 		# Fill in start.
 
@@ -93,6 +97,7 @@ while 1:
 			if debug:
 				print("Host info:",host)
 			c.connect((host,port))
+
 			try:
 				# Create a temporary file on this socket and ask port 80 for the file requested by the client
 				#fileobj = c.makefile('r', 0)
@@ -101,31 +106,40 @@ while 1:
 				#outfile = fileobj.read()
 				#print "Output data is:\n","-"*lenx,"\n",outfile
 				# Read the response into buffer
+				fileobj = open("tmpfile","w")
 				out = None
 				while 1:
 					out = c.recv(4096)
-					if debug:#see the ouput data needed to be sent to the client
-						print "Output: ",out
+						
 					if len(out) > 0:
 						tcpCliSock.send(out.encode())#sending to the client
+						fileobj.write(out)
 					else:
-						break
-				# Fill in start.
-				if debug:
-					print out
-				# Fill in end.
+						fileobj.write(out)#writes out the last bytes of information
+						fileobj.close #closes file
+						break #breaks while loop
+				
+				if debug: #to view out put
+					print "The output is: ", out				# Fill in end.
 
 				# Create a new file in the cache for the requested file.
 				# Create the directory structure if necessary.
 				# Also send the response in the buffer to client socket and the corresponding file in the cache
-				if not os.path.exists(filename):
-   					os.makedirs(os.path.dirname(filename))
+				#'''
+				
 
-				tmpFile = open("./" + filetouse,"wb")
-				tmpFile.write()
-				# Fill in start.
+				if os.path.isdir(filename2):
+					os.makedirs(os.path.dirname(filename2))
 
-				# Fill in end.
+				fileobj2 = open("tmpfile","r")
+				tmpFile = open(filetouse,"w")
+				
+				for line in fileobj2:
+					tmpFile.write(line)
+				
+				
+				#'''
+				tmpFile.close()
 				c.close()
 
 			except:
@@ -139,5 +153,6 @@ while 1:
 
 	# Close the client and the server sockets
 	tcpCliSock.close()
+	
 
 tcpSerSock.close()
