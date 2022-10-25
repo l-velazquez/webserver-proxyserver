@@ -10,8 +10,8 @@
 from socket import *
 import sys # In order to terminate the program
 
-debug = 0
-PORT = 12000
+debug = 1
+PORT = 8000
 
 serverSocket = socket(AF_INET, SOCK_STREAM)
 #Prepare a sever socket

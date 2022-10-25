@@ -2,6 +2,7 @@
 
 
 
+from distutils.log import debug
 from socket import *
 import os
 import sys
@@ -13,6 +14,7 @@ if len(sys.argv) <= 1:
 ADDRESS = sys.argv[1]
 PORT = int(sys.argv[2])
 lenx = 70
+debug = 0
 
 
 print "-"*lenx
@@ -33,28 +35,30 @@ while 1:
 	tcpCliSock, addr = tcpSerSock.accept()
 	print 'Received a connection from:', addr
 	message = tcpCliSock.recv(4096) 			# Fill in end.
-	print message
+	
 
 	# Extract the filename and hostname from the given message
-	print message.split()[1]
-	filename = message.split()[1].partition("/")[2]
-	print "filename1", filename
-	filename = filename.split("/")[0]
-	print "filename2", filename
-	hostname = filename[0]
-	if len(filename) > len(hostname):
-		hostname = filename	
-	print "Hostname", hostname
+	filename1 = message.split()[1].partition("/")[2]
+	filename2 = filename1.split("/")[0]
+	hostname = filename2[0]
+	if len(filename2) > len(hostname):
+		hostname = filename2	
+	
 	#filename = "/".join(filename[1:])
-	print "Filename", filename
-	print "Hostname", hostname
+	if debug:
+		print message
+		print message.split()[1]
+		print "filename1", filename1
+		print "filename2", filename2
+		print "Filename", filename2
+		print "Hostname", hostname
 	fileExist = "false"
 
 	# File to use in cache
-	filetouse = filename
+	filetouse = filename2
 
 	# Check if filename is a directory
-	if filename[-1] == "/":
+	if filename2[-1] == "/":
 		filetouse += "index.html"
 
 	try:
@@ -64,7 +68,6 @@ while 1:
 		fileExist = "true"
 		# ProxyServer finds a cache hit and generates a response message
 		tcpCliSock.send("HTTP/1.0 200 OK\r\n")
-
 		# You might want to play with this part.  It is not always html in the cache
 		tcpCliSock.send("Content-Type:text/html\r\n")
 
@@ -82,20 +85,20 @@ while 1:
 			host = gethostbyname(hostname)
 			c.connect((host,port))
 			try:
-				# Connect to the socket to port 80
-
-				# Fill in start.
-
-				# Fill in end.
-
 				# Create a temporary file on this socket and ask port 80 for the file requested by the client
-				fileobj = c.makefile('r', 0)
-				fileobj.write("GET "+"http://" + filename + " HTTP/1.0\nHost: "+hostname+ "\n\n")
-				print"File object",fileobj
-				outfile = fileobj.read()
-				print "Output data is\n","-"*lenx,"\n",outfile
+				#fileobj = c.makefile('r', 0)
+				#fileobj.write("GET "+"http://" + filename2 + " HTTP/1.0\nHost: "+hostname+ "\n\n")
+				c.sendall(("GET "+"http://" + filename2 + " HTTP/1.0\nHost: "+hostname+ "\n\n").encode())
+				#outfile = fileobj.read()
+				#print "Output data is:\n","-"*lenx,"\n",outfile
 				# Read the response into buffer
-				c.send(outfile.encode())
+				while 1:
+					out = c.recv(4096)
+					print "Output: ",out
+					if len(out) > 0:
+						tcpCliSock.send(out.encode())
+					else:
+						break
 				# Fill in start.
 
 				# Fill in end.
@@ -103,13 +106,14 @@ while 1:
 				# Create a new file in the cache for the requested file.
 				# Create the directory structure if necessary.
 				# Also send the response in the buffer to client socket and the corresponding file in the cache
-				if not os.path.exists(filename):
+				'''if not os.path.exists(filename):
    					os.makedirs(os.path.dirname(filename))
 
-				tmpFile = open("./" + filetouse,"wb")
+				tmpFile = open("./" + filetouse,"wb")'''
 				# Fill in start.
 
 				# Fill in end.
+				c.close()
 
 			except:
 				print "Illegal request"
