@@ -1,8 +1,6 @@
 #Run code using Python 2.7.18
 
 
-
-from distutils.log import debug
 from socket import *
 import os
 import sys
@@ -14,7 +12,7 @@ if len(sys.argv) <= 1:
 ADDRESS = sys.argv[1]
 PORT = int(sys.argv[2])
 lenx = 75
-debug = 0 #meant to debug the code
+debug = 1 #meant to debug the code
 
 #formating for the terminal
 
@@ -22,6 +20,7 @@ print("\nProgram by: Luis Fernando Javier Velazquez Sosa")
 print "-"*lenx
 print "\t\t\tProxy server address at:",ADDRESS
 print "\t\t\tPort:", PORT
+print "\t\t\t",ADDRESS,":",PORT
 print "-"*lenx
 print "|"*lenx
 
@@ -34,7 +33,7 @@ while 1:
 
 	# Start receiving data from the client
 	print "-"*lenx
-	print '\nReady to serve...'
+	print '\nReady to serve...\a'
 	tcpCliSock, addr = tcpSerSock.accept()
 	print 'Received a connection from:', addr
 	message = tcpCliSock.recv(4096) 			# Fill in end.
@@ -46,7 +45,11 @@ while 1:
 	hostname = filename2[0]
 	if len(filename2) > len(hostname):
 		hostname = filename2	
-	
+	fileExist = "false"
+	if filename2.split(".")[0]=="www":
+		filetouse = filename2.split(".")[1]
+	else:
+		filetouse = filename2.split(".")[0]
 	#filename = "/".join(filename[1:])
 	if debug:
 		print message
@@ -55,10 +58,11 @@ while 1:
 		print "filename2", filename2
 		print "Filename", filename2
 		print "Hostname", hostname
-	fileExist = "false"
+		print "file to use:",filetouse
+	
 
 	# File to use in cache
-	filetouse = filename2
+	
 
 	# Check if filename is a directory
 	if filename2[-1] == "/":
@@ -97,7 +101,7 @@ while 1:
 				#outfile = fileobj.read()
 				#print "Output data is:\n","-"*lenx,"\n",outfile
 				# Read the response into buffer
-
+				out = None
 				while 1:
 					out = c.recv(4096)
 					if debug:#see the ouput data needed to be sent to the client
@@ -107,16 +111,18 @@ while 1:
 					else:
 						break
 				# Fill in start.
-
+				if debug:
+					print out
 				# Fill in end.
 
 				# Create a new file in the cache for the requested file.
 				# Create the directory structure if necessary.
 				# Also send the response in the buffer to client socket and the corresponding file in the cache
-				'''if not os.path.exists(filename):
+				if not os.path.exists(filename):
    					os.makedirs(os.path.dirname(filename))
 
-				tmpFile = open("./" + filetouse,"wb")'''
+				tmpFile = open("./" + filetouse,"wb")
+				tmpFile.write()
 				# Fill in start.
 
 				# Fill in end.
