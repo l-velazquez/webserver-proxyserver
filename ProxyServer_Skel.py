@@ -13,15 +13,18 @@ if len(sys.argv) <= 1:
 
 ADDRESS = sys.argv[1]
 PORT = int(sys.argv[2])
-lenx = 70
-debug = 0
+lenx = 75
+debug = 0 #meant to debug the code
 
+#formating for the terminal
 
+print("\nProgram by: Luis Fernando Javier Velazquez Sosa")
 print "-"*lenx
-print "Server address at",ADDRESS
-print "Port:", PORT
+print "\t\t\tProxy server address at:",ADDRESS
+print "\t\t\tPort:", PORT
 print "-"*lenx
-print "*"*lenx
+print "|"*lenx
+
 # Create a server socket, bind it to a port and start listening
 tcpSerSock = socket(AF_INET, SOCK_STREAM)
 tcpSerSock.bind((ADDRESS,PORT))
@@ -83,6 +86,8 @@ while 1:
 			c = socket()# Fill in start. 			# Fill in end.
 			port = 80
 			host = gethostbyname(hostname)
+			if debug:
+				print("Host info:",host)
 			c.connect((host,port))
 			try:
 				# Create a temporary file on this socket and ask port 80 for the file requested by the client
@@ -92,11 +97,13 @@ while 1:
 				#outfile = fileobj.read()
 				#print "Output data is:\n","-"*lenx,"\n",outfile
 				# Read the response into buffer
+
 				while 1:
 					out = c.recv(4096)
-					print "Output: ",out
+					if debug:#see the ouput data needed to be sent to the client
+						print "Output: ",out
 					if len(out) > 0:
-						tcpCliSock.send(out.encode())
+						tcpCliSock.send(out.encode())#sending to the client
 					else:
 						break
 				# Fill in start.
