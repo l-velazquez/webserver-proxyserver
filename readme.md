@@ -28,6 +28,7 @@ To access the proxy server you write in your browser:
 
     localhost:<port>/httpforever.com
 
-Bugs-------------------------------------------------------------------------------------------
+Bugs
+-------------------------------------------------------------------------------------------
 There are still bug with the code, the page is cached but can't be sent to the client. Blank page appears.
 Also cache files are created in the same directory as the code. This will need to be fix for better organization when accessing the files.
