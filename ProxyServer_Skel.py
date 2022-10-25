@@ -82,10 +82,6 @@ while 1:
 		for line in f:
 			tcpCliSock.send(line)
 
-		# Fill in start.
-
-		# Fill in end.
-
 		print 'Read from cache'
 	# Error handling for file not found in cache
 	except IOError:
